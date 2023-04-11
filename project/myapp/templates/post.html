@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="main-container">
+    <section class="content-container">
+        <div class="content">
+            <article class="post">
+                <div class="post__header">
+
+                        <div class="post__profile">
+                            {% if  post.user.profile.profile_picture %}
+                            <a class="post__avatar">
+
+                                <img src="{{ post.user.profile.profile_picture.url }}" alt="User Picture">
+
+                            </a>
+                            {% endif %}
+                            <a href="{{ post.user.username}}" class="post__user">{{ post.user.username }}</a>
+
+                        </div>
+                </div>
+
+                <div class="post__content">
+                    <div class="post__medias">
+
+                       <a><img class="post__media" src="{{ post.picture.url }}" alt="Post Content" style="width: 700px; height: 348px; object-fit: cover;"></a>
+                    </div>
+                </div>
+
+
+
+                <div class="post__footer">
+                    <div class="post__buttons">
+                        <div class="post__likes">
+                            {% if post.id in likes %}
+                                <a href="{% url 'like' post.id %}"><img src = "{% static 'assets/icons/heart-filled.svg' %}" alt="like"/></a>
+                            {% else %}
+                                <a href="{% url 'like' post.id %}"><img src = "{% static 'assets/icons/heart.svg' %}" alt="like"/></a>
+                            {% endif %}
+                            <span>{{post.likes}} <a class="post__name--underline" href="#">likes</a></span>
+                        </div>
+                        <div class="post__buttons">
+                            <div class="post__likes">
+                                <a href="{% url 'post' post.id %}"><img src = "{% static 'assets/icons/comment.svg' %}" alt="comment"/></a>
+                                <span>{{ nr_comments }} <a class="post__name--underline" href="#">comments</a></span>
+                            </div>
+                        </div>
+                        <div class="post__buttons">
+                            <div class="post__likes">
+                                <a href="{% url 'share' post.id %}"><img src = "{% static 'assets/icons/share.svg' %}" alt="share"/></a>
+                                <span>{{post.shares}} <a class="post__name--underline" href="#">shares</a></span>
+                            </div>
+                        </div>
+
+
+                        <div class="post__indicators"></div>
+
+                    </div>
+
+                    <div class="post__infos">
+                        <div class="post__description">
+                            <span>
+                                <a class="post__name--underline" href="#"><b>@{{post.user.username}}</b></a>
+                                {{post.caption}}
+
+                            </span>
+                        </div>
+
+                        <p style="font-size: 13px;">
+                            {% for tag in post.hashtags.all %}
+                            <a href="{{ tag.get_absolute_url }}" style="text-decoration: none;">
+                                #{{ tag }}
+                            </a>
+                            {% endfor %}
+                        </p>
+
+
+                        <div class="container mt-1">
+                            <div class="d-flex justify-content-right row">
+                                <div class="col-md-8 col-lg-8">
+                                    <div class="d-flex flex-column comment-section">
+                                        {% for comment in comments %}
+                                        {% if comment.post.id == post.id %}
+                                        <div class="bg-white p-2">
+                                            <div class="d-flex flex-row user-info">
+                                                <img class="post__avatar" src="{{comment.user.profile.profile_picture.url}}" >
+                                                <div class="d-flex flex-column justify-content-start ml-2">
+                                                    <span class="post__user"> {{comment.user.username}}</span>
+                                                    <span class="post__date-time"> {{comment.date_posted}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <p class="comment-text">{{ comment.textbody }}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <article class="media">
+                            <div class="media-content">
+                              <form method="post" action="">
+                                {% csrf_token %}
+                                <div class="field">
+                                    <p class="control">
+                                        {{ form.textbody }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <button type="submit" class="button">Post comment</button>
+                                </div>
+                              </form>
+                            </div>
+                        </article>
+
+
+                        <span class="post__date-time">{{post.date_posted}}</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+{% endblock %}

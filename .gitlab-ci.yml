@@ -1,0 +1,46 @@
+image: python:3.10
+
+stages:
+  - build
+  - validate
+  - test
+
+
+variables:
+  SECRET_KEY: "django-insecure-53d1xu02m1miuch4nnvsy1g1l_3k0cmu7c==j#e7vim@i)nktl"
+  DEBUG: "True"
+  ALLOWED_HOSTS: "['*']"
+  DB_ENGINE: "django.db.backends.sqlite3"
+  DB_NAME: "test_database.sqlite3"
+  STATIC_URL: "/static/"
+
+# This folder is cached between builds
+# http://docs.gitlab.com/ee/ci/yaml/README.html#cache
+cache:
+  paths:
+  - ~/.cache/pip/
+
+before_script:
+  - pip install -r requirements.txt
+  - cd project
+
+build:
+  stage: build
+  script:
+    - python3 manage.py makemigrations
+    - python3 manage.py migrate
+    - python3 manage.py check
+
+checkStyle:
+  stage: validate
+  script:
+    - pylint --ignore-path=myapp/migrations --ignore-patterns=test_.*?py --disable=E1101,R0903,E0307,W0612,W0613,E0213,W0642 */
+    - bandit -r ./myapp
+    - mypy myapp --ignore-missing-imports
+    - flake8 .
+
+test:
+  stage: test
+  script:
+    - coverage run --source=myapp --omit=*/migrations/*,*/tests/* ./manage.py test myapp
+    - coverage report -m

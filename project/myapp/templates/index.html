@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <main class="main-container">
+        <section class="content-container">
+            <div class="content">
+                <div class="stories">
+                    <button class="stories__left-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path fill="var(--primary)" d="M256 504C119 504 8 393 8 256S119 8 256 8s248 111 248 248-111 248-248 248zM142.1 273l135.5 135.5c9.4 9.4 24.6 9.4 33.9 0l17-17c9.4-9.4 9.4-24.6 0-33.9L226.9 256l101.6-101.6c9.4-9.4 9.4-24.6 0-33.9l-17-17c-9.4-9.4-24.6-9.4-33.9 0L142.1 239c-9.4 9.4-9.4 24.6 0 34z"></path>
+                        </svg>
+                    </button>
+                    <div class="stories__content">
+                        {% for story in stories %}
+                        <button class="story">
+                            <div class="story__avatar">
+                                <div class="story__border">
+                                    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+                                        <circle r="31" cy="32" cx="32"/>
+                                    </svg>
+                                </div>
+                                <div class="story__picture">
+                                    <img src="{{ story.following.profile.profile_picture.url }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                            </div>
+                            <span class="story__user">@{{story.following.profile.user.username}}</span>
+                        </button>
+                        {% endfor %}
+
+                    <button class="stories__right-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path fill="var(--primary)" d="M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="posts">
+                    {% for post in posts %}
+
+                    <article class="post">
+                        <div class="post__header">
+
+                                <div class="post__profile">
+                                    {% if  post.user.profile.profile_picture %}
+                                    <a class="post__avatar">
+                                        
+                                        <img src="{{ post.user.profile.profile_picture.url }}" alt="User Picture">
+                                        
+                                    </a>
+                                    {% endif %}
+                                    <a href="{{ post.user.username}}" class="post__user">{{ post.user.username }} • {{ post.date_posted }}</a>
+                                    
+                                </div>
+                            
+                            <button class="post__more-options">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="6.5" cy="11.5" r="1.5" fill="var(--text-dark)"/>
+                                    <circle cx="12" cy="11.5" r="1.5" fill="var(--text-dark)"/>
+                                    <circle cx="17.5" cy="11.5" r="1.5" fill="var(--text-dark)"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="post__content">
+                            <div class="post__medias">
+                               <a href="{% url 'post' post.id %}">
+                                    <img class="post__media" src="{{ post.picture.url }}" alt="Post Content" style="width: 700px; height: 348px; object-fit: cover;">
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="post__footer">
+                            <div class="post__buttons">
+                                <div class="post__likes">
+                                    {% if post.id in likes %}
+                                        <a href="{% url 'like' post.id %}"><img src = "{% static 'assets/icons/heart-filled.svg' %}" alt="like"/></a>
+                                    {% else %}
+                                        <a href="{% url 'like' post.id %}"><img src = "{% static 'assets/icons/heart.svg' %}" alt="like"/></a>
+                                    {% endif %}
+                                    <span>{{post.likes}} <a class="post__name--underline" href="#">likes</a></span>
+                                </div>
+                                <div class="post__buttons">
+                                    <div class="post__likes">
+                                        <a href="{% url 'post' post.id %}"><img src = "{% static 'assets/icons/comment.svg' %}" alt="comment"/></a>
+                                        <span>{{ nr_comments }} <a class="post__name--underline" href="#">comments</a></span>
+                                    </div>
+                                </div>
+                                <div class="post__buttons">
+                                    <div class="post__likes">
+                                        <a href="{% url 'share' post.id %}"><img src = "{% static 'assets/icons/share.svg' %}" alt="share"/></a>
+                                        <span>{{post.shares}} <a class="post__name--underline" href="#">shares</a></span>
+                                    </div>
+                                </div>
+                                <div class="post__indicators"></div>
+                            </div>
+
+                            <div class="post__infos">
+                                <div class="post__description">
+                                    <span>
+                                        <a class="post__name--underline" href="#"><b>@{{post.user.username}}</b></a>
+                                        {{post.caption}}
+
+                                    </span>
+                                </div>
+
+                                <p style="font-size: 13px;">
+                                    {% for tag in post.hashtags.all %}
+                                    <a href="{{ tag.get_absolute_url }}" style="text-decoration: none;">
+                                        #{{ tag }}
+                                    </a>
+                                    {% endfor %}
+                                </p>
+
+                                <div class="container mt-1">
+                                    <div class="d-flex justify-content-right row">
+                                        <div class="col-md-8 col-lg-8">
+                                            <div class="d-flex flex-column comment-section">
+                                                {% for comment in comments %}
+                                                        {% if comment.post.id == post.id %}
+                                                            <div class="bg-white p-2">
+                                                                <div class="d-flex flex-row user-info">
+                                                                    <a href="{{ post.get_absolute_url }}"><img class="post__avatar" src="{{comment.user.profile.profile_picture.url}}" ></a>
+                                                                    <div class="d-flex flex-column justify-content-start ml-2">
+                                                                        <span class="post__user"> {{comment.user.username}}</span>
+                                                                        <span class="post__date-time"> {{comment.date_posted}}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-2">
+                                                                    <p class="comment-text">{{ comment.textbody }}</p>
+                                                                </div>
+                                                            </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <span class="post__date-time">{{post.date_posted}}</span>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <section class="side-menu">
+                <div class="side-menu__user-profile">
+                    <a href="" target="_blank" class="side-menu__user-avatar">
+                        <img src="{{ request.user.profile.profile_picture.url }}" alt="User Picture">
+                    </a>
+                    <div class="side-menu__user-info">
+                        {% if request.user.profile.first_name %}
+                            <h7>{{request.user.profile.first_name|title }} {{request.user.profile.last_name|title }}</h7>
+                        {% else %}
+                            <h7>{{ request.user.username}}</h7>
+                        {% endif %}
+                        <span>@{{request.user.username}}</span>
+                    </div>
+                </div>
+
+                <div class="side-menu__suggestions-section">
+                    <div class="side-menu__suggestions-header">
+                        <h2>Suggestions for You</h2>
+                        <button>See All</button>
+                    </div>
+                    <div class="side-menu__suggestions-content">
+                        {% for suggestion in recommended|slice:":10" %}
+                           <div class="side-menu__suggestion">
+                               <a href="{% url 'post' suggestion.id %}" class="side-menu__suggestion-avatar">
+                                   <img src="{{ suggestion.picture.url }}" alt="Post Picture">
+                               </a>
+
+                                <div class="side-menu__suggestion-info">
+                                    <span>{{ suggestion.caption }}</span>
+                                    {% for tag in suggestion.hashtags.all %}
+                                        <a href="{{ tag.get_absolute_url }}" style="text-decoration: none;">
+                                            <span>#{{ tag }}</span>
+
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                           </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}
